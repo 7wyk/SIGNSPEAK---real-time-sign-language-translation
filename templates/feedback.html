@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback - Sign Language Detection{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto;">
+    <h2>Feedback</h2>
+    <p>We value your feedback! Please share your experience with our sign language detection system.</p>
+    
+    <div id="message"></div>
+    
+    <form id="feedbackForm">
+        <div class="form-group">
+            <label for="feedback">Your Feedback:</label>
+            <textarea id="feedback" name="feedback" rows="5" placeholder="Please share your thoughts, suggestions, or report any issues..." required></textarea>
+        </div>
+        
+        <button type="submit" class="btn">Submit Feedback</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const feedback = document.getElementById('feedback').value;
+    
+    try {
+        const response = await fetch('/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                feedback: feedback
+            })
+        });
+        
+        const data = await response.json();
+        const messageDiv = document.getElementById('message');
+        
+        if (data.success) {
+            messageDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+            document.getElementById('feedback').value = '';
+        } else {
+            messageDiv.innerHTML = '<div class="alert alert-error">Failed to submit feedback. Please try again.</div>';
+        }
+    } catch (error) {
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">Failed to submit feedback. Please try again.</div>';
+    }
+});
+</script>
+{% endblock %}

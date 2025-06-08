@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Sign Language Detection{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 50px auto;">
+    <h2>Login</h2>
+    
+    <div id="message"></div>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <button type="submit" class="btn">Login</button>
+    </form>
+    
+    <p style="margin-top: 20px;">
+        Don't have an account? <a href="/register">Register here</a>
+    </p>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+        
+        const data = await response.json();
+        const messageDiv = document.getElementById('message');
+        
+        if (data.success) {
+            localStorage.setItem('token', data.token);
+            messageDiv.innerHTML = '<div class="alert alert-success">Login successful! Redirecting...</div>';
+            setTimeout(() => {
+                window.location.href = '/detect';
+            }, 1500);
+        } else {
+            messageDiv.innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+        }
+    } catch (error) {
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">Login failed. Please try again.</div>';
+    }
+});
+</script>
+{% endblock %}

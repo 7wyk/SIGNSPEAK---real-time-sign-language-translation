@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Detection - Sign Language Detection{% endblock %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h2>Sign Language Detection</h2>
+    
+    <div id="message"></div>
+    
+    <div style="margin: 20px 0;">
+        <button id="startBtn" class="btn" onclick="startDetection()">Start Detection</button>
+        <button id="stopBtn" class="btn btn-danger" onclick="stopDetection()" disabled>Stop Detection</button>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <label for="languageSelect">Translate to:</label>
+        <select id="languageSelect" style="margin-left: 10px; padding: 5px;">
+            <option value="hindi">Hindi</option>
+            <option value="kannada">Kannada</option>
+            <option value="malayalam">Malayalam</option>
+        </select>
+        <button id="translateBtn" class="btn" onclick="translateText()" disabled>Translate</button>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <img id="videoFeed" style="max-width: 100%; height: auto; border: 2px solid #333;" />
+    </div>
+    
+    <div id="detectionResults" style="margin: 20px 0;">
+        <div style="margin-bottom: 20px;">
+            <h3>Detected Sign:</h3>
+            <p id="detectedSign" style="font-size: 24px; font-weight: bold; color: #007bff;">-</p>
+        </div>
+        
+        <div id="translationSection" style="margin-top: 20px;">
+            <h3>Translation:</h3>
+            <p id="translatedText" style="font-size: 20px; font-weight: bold; color: #28a745;">-</p>
+        </div>
+    </div>
+</div>
+
+<script>
+let detectionInterval;
+let speechSynthesis = window.speechSynthesis;
+let lastSpokenText = '';
+let isDetecting = false;
+
+// Check authentication
+const token = localStorage.getItem('token');
+if (!token) {
+    window.location.href = '/login';
+}
+
+async function startDetection() {
+    try {
+        const response = await fetch('/start_detection', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('message').innerHTML = '<div class="alert alert-success">Detection started successfully!</div>';
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('translateBtn').disabled = false;
+            
+            // Start video feed
+            document.getElementById('videoFeed').src = '/video_feed';
+            isDetecting = true;
+            
+            // Start polling for predictions
+            detectionInterval = setInterval(getPrediction, 500);
+        } else {
+            document.getElementById('message').innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+        }
+    } catch (error) {
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">Failed to start detection. Please try again.</div>';
+    }
+}
+
+async function stopDetection() {
+    try {
+        const response = await fetch('/stop_detection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('message').innerHTML = '<div class="alert alert-success">Detection stopped successfully!</div>';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('translateBtn').disabled = true;
+            
+            // Stop video feed
+            document.getElementById('videoFeed').src = '';
+            isDetecting = false;
+            
+            // Clear interval
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+            }
+            
+            // Reset displays
+            document.getElementById('detectedSign').textContent = '-';
+            document.getElementById('translatedText').textContent = '-';
+        } else {
+            document.getElementById('message').innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+        }
+    } catch (error) {
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">Failed to stop detection. Please try again.</div>';
+    }
+}
+
+async function getPrediction() {
+    if (!isDetecting) return;
+    
+    try {
+        const response = await fetch('/get_prediction');
+        const data = await response.json();
+        
+        if (data.prediction && data.prediction !== '') {
+            document.getElementById('detectedSign').textContent = data.prediction;
+            
+            // Text-to-speech
+            if (data.prediction !== lastSpokenText) {
+                speakText(data.prediction);
+                lastSpokenText = data.prediction;
+            }
+        }
+    } catch (error) {
+        console.error('Error getting prediction:', error);
+    }
+}
+
+function speakText(text) {
+    if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+    }
+    
+    const utterance = new SpeechSynthesisUtterance(text.replace('_', ' '));
+    utterance.rate = 0.8;
+    utterance.pitch = 1;
+    speechSynthesis.speak(utterance);
+}
+
+async function translateText() {
+    const currentText = document.getElementById('detectedSign').textContent;
+    const selectedLanguage = document.getElementById('languageSelect').value;
+    
+    if (currentText === '-' || currentText === '') {
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">No text to translate!</div>';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/translate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: currentText,
+                language: selectedLanguage
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('translatedText').textContent = data.translated_text;
+            
+            // Speak translated text
+            speakText(data.translated_text);
+        } else {
+            document.getElementById('message').innerHTML = '<div class="alert alert-error">Translation failed: ' + data.message + '</div>';
+        }
+    } catch (error) {
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">Translation failed. Please try again.</div>';
+    }
+}
+
+// Clear messages after 5 seconds
+setInterval(() => {
+    const messageDiv = document.getElementById('message');
+    if (messageDiv.innerHTML.trim() !== '') {
+        setTimeout(() => {
+            messageDiv.innerHTML = '';
+        }, 5000);
+    }
+}, 1000);
+</script>
+{% endblock %}

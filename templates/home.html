@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Sign Language Detection{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 50px 0;">
+    <h1>Sign Language Detection System</h1>
+    <p>Real-time sign language recognition and translation</p>
+    
+    <div style="margin: 40px 0;">
+        <h2>Features:</h2>
+        <ul style="list-style: none; padding: 0;">
+            <li>✓ Real-time hand sign detection</li>
+            <li>✓ Text and speech output</li>
+            <li>✓ Multi-language translation</li>
+            <li>✓ User authentication</li>
+        </ul>
+    </div>
+    
+    <button class="btn" onclick="getStarted()" style="font-size: 18px; padding: 15px 30px;">
+        Get Started
+    </button>
+</div>
+
+<script>
+function getStarted() {
+    const token = localStorage.getItem('token');
+    if (token) {
+        window.location.href = '/detect';
+    } else {
+        window.location.href = '/login';
+    }
+}
+</script>
+{% endblock %}
