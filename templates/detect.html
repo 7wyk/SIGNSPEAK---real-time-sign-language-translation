@@ -1,41 +1,115 @@
 {% extends "base.html" %}
 
-{% block title %}Detection - Sign Language Detection{% endblock %}
+{% block title %}SignSpeak AI - Real-time Sign Language Detection{% endblock %}
 
 {% block content %}
-<div style="text-align: center;">
-    <h2>Sign Language Detection</h2>
+<div class="fade-in" style="text-align: center;">
+    <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 15px; background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        Sign Language Detection
+    </h1>
+    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Real-time sign language recognition and translation
+    </p>
     
-    <div id="message"></div>
+    <!-- Message Alert -->
+    <div id="message" style="margin-bottom: 30px;"></div>
     
-    <div style="margin: 20px 0;">
-        <button id="startBtn" class="btn" onclick="startDetection()">Start Detection</button>
-        <button id="stopBtn" class="btn btn-danger" onclick="stopDetection()" disabled>Stop Detection</button>
-    </div>
-    
-    <div style="margin: 20px 0;">
-        <label for="languageSelect">Translate to:</label>
-        <select id="languageSelect" style="margin-left: 10px; padding: 5px;">
-            <option value="hindi">Hindi</option>
-            <option value="kannada">Kannada</option>
-            <option value="malayalam">Malayalam</option>
-        </select>
-        <button id="translateBtn" class="btn" onclick="translateText()" disabled>Translate</button>
-    </div>
-    
-    <div style="margin: 20px 0;">
-        <img id="videoFeed" style="max-width: 100%; height: auto; border: 2px solid #333;" />
-    </div>
-    
-    <div id="detectionResults" style="margin: 20px 0;">
-        <div style="margin-bottom: 20px;">
-            <h3>Detected Sign:</h3>
-            <p id="detectedSign" style="font-size: 24px; font-weight: bold; color: #007bff;">-</p>
+    <!-- Control Buttons -->
+    <div class="card" style="margin-bottom: 30px; text-align: center;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 30px;">
+            <button id="startBtn" class="btn pulse" onclick="startDetection()" style="font-size: 16px; padding: 15px 30px;">
+                🎥 Start Detection
+            </button>
+            <button id="stopBtn" class="btn btn-danger" onclick="stopDetection()" disabled style="font-size: 16px; padding: 15px 30px;">
+                ⏹️ Stop Detection
+            </button>
         </div>
         
-        <div id="translationSection" style="margin-top: 20px;">
-            <h3>Translation:</h3>
-            <p id="translatedText" style="font-size: 20px; font-weight: bold; color: #28a745;">-</p>
+        <!-- Language Selection -->
+        <div class="form-group" style="display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <label for="languageSelect" style="color: rgba(255, 255, 255, 0.9); font-weight: 600; margin-bottom: 0;">
+                Translate to:
+            </label>
+            <select id="languageSelect" style="width: auto; min-width: 150px;">
+                <option value="hindi">🇮🇳 Hindi</option>
+                <option value="kannada">🇮🇳 Kannada</option>
+                <option value="malayalam">🇮🇳 Malayalam</option>
+            </select>
+            <button id="translateBtn" class="btn btn-success" onclick="translateText()" disabled style="padding: 12px 24px;">
+                🌐 Translate
+            </button>
+        </div>
+    </div>
+    
+    <!-- Video Feed Container -->
+     <!-- Video Feed Container -->
+<div class="video-container fade-in" style="display: flex; justify-content: center; align-items: center;">
+    <img id="videoFeed" src="" alt="Camera feed will appear here"
+     style="display: none; width: 70%; max-width: 700px; height: auto; border-radius: 15px;
+     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);" />
+    <div id="cameraPlaceholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; color: rgba(255, 255, 255, 0.6); text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 20px;">📹</div>
+        <p style="font-size: 1.2rem;">Camera feed will appear here</p>
+    </div>
+</div>
+
+    
+    <!-- Detection Results -->
+    <div class="detection-results fade-in">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            <!-- Detected Sign Card -->
+            <div class="card" style="text-align: center;">
+                <h3 style="margin-bottom: 20px; background: linear-gradient(45deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.5rem;">
+                    🤟 Detected Sign
+                </h3>
+                <div class="detection-text" id="detectedSign">
+                    Waiting for detection...
+                </div>
+                <div style="margin-top: 15px;">
+                    <small style="color: rgba(255, 255, 255, 0.6);">
+                        Perform sign language gestures in front of the camera
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Translation Card -->
+            <div class="card" style="text-align: center;">
+                <h3 style="margin-bottom: 20px; background: linear-gradient(45deg, #10b981, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.5rem;">
+                    🌍 Translation
+                </h3>
+                <div class="detection-text" id="translatedText" style="background: linear-gradient(45deg, #10b981, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    Click translate to see translation
+                </div>
+                <div style="margin-top: 15px;">
+                    <small style="color: rgba(255, 255, 255, 0.6);">
+                        Select your preferred language above
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Instructions Card -->
+    <div class="card fade-in" style="margin-top: 40px; text-align: left;">
+        <h3 style="text-align: center; margin-bottom: 30px; background: linear-gradient(45deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            📋 How to Use
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+            <div style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(45deg, #3b82f6, #60a5fa); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 24px;">1</div>
+                <h4 style="margin-bottom: 10px; color: rgba(255, 255, 255, 0.9);">Start Detection</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Click "Start Detection" to activate your camera and begin sign recognition</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(45deg, #8b5cf6, #a78bfa); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 24px;">2</div>
+                <h4 style="margin-bottom: 10px; color: rgba(255, 255, 255, 0.9);">Perform Signs</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Make clear hand gestures in front of the camera for best recognition</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(45deg, #10b981, #34d399); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 24px;">3</div>
+                <h4 style="margin-bottom: 10px; color: rgba(255, 255, 255, 0.9);">Get Translation</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Select your language and click translate for instant translation</p>
+            </div>
         </div>
     </div>
 </div>
@@ -52,7 +126,26 @@ if (!token) {
     window.location.href = '/login';
 }
 
+function showMessage(message, type = 'success') {
+    const messageDiv = document.getElementById('message');
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+    messageDiv.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        messageDiv.innerHTML = '';
+    }, 5000);
+}
+
 async function startDetection() {
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const translateBtn = document.getElementById('translateBtn');
+    
+    // Add loading state
+    startBtn.innerHTML = '<span class="loading"></span> Starting...';
+    startBtn.disabled = true;
+    
     try {
         const response = await fetch('/start_detection', {
             method: 'POST',
@@ -65,26 +158,46 @@ async function startDetection() {
         const data = await response.json();
         
         if (data.success) {
-            document.getElementById('message').innerHTML = '<div class="alert alert-success">Detection started successfully!</div>';
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('stopBtn').disabled = false;
-            document.getElementById('translateBtn').disabled = false;
+            showMessage('🎉 Detection started successfully! Make signs in front of the camera.', 'success');
             
-            // Start video feed
-            document.getElementById('videoFeed').src = '/video_feed';
+            // Update button states
+            startBtn.style.display = 'none';
+            stopBtn.disabled = false;
+            translateBtn.disabled = false;
+            
+            // Show video feed and hide placeholder
+            const videoFeed = document.getElementById('videoFeed');
+            const placeholder = document.getElementById('cameraPlaceholder');
+            
+            videoFeed.src = '/video_feed';
+            videoFeed.style.display = 'block';
+            placeholder.style.display = 'none';
+            
             isDetecting = true;
             
             // Start polling for predictions
-            detectionInterval = setInterval(getPrediction, 500);
+            detectionInterval = setInterval(getPrediction, 100);
+;
+            
+            // Update detection status
+            document.getElementById('detectedSign').textContent = 'Detecting signs...';
         } else {
-            document.getElementById('message').innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+            showMessage('❌ ' + data.message, 'error');
+            startBtn.innerHTML = '🎥 Start Detection';
+            startBtn.disabled = false;
         }
     } catch (error) {
-        document.getElementById('message').innerHTML = '<div class="alert alert-error">Failed to start detection. Please try again.</div>';
+        showMessage('❌ Failed to start detection. Please check your camera permissions.', 'error');
+        startBtn.innerHTML = '🎥 Start Detection';
+        startBtn.disabled = false;
     }
 }
 
 async function stopDetection() {
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const translateBtn = document.getElementById('translateBtn');
+    
     try {
         const response = await fetch('/stop_detection', {
             method: 'POST',
@@ -96,13 +209,23 @@ async function stopDetection() {
         const data = await response.json();
         
         if (data.success) {
-            document.getElementById('message').innerHTML = '<div class="alert alert-success">Detection stopped successfully!</div>';
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('translateBtn').disabled = true;
+            showMessage('⏹️ Detection stopped successfully!', 'success');
             
-            // Stop video feed
-            document.getElementById('videoFeed').src = '';
+            // Update button states
+            startBtn.style.display = 'inline-block';
+            startBtn.innerHTML = '🎥 Start Detection';
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            translateBtn.disabled = true;
+            
+            // Hide video feed and show placeholder
+            const videoFeed = document.getElementById('videoFeed');
+            const placeholder = document.getElementById('cameraPlaceholder');
+            
+            videoFeed.src = '';
+            videoFeed.style.display = 'none';
+            placeholder.style.display = 'flex';
+            
             isDetecting = false;
             
             // Clear interval
@@ -111,13 +234,13 @@ async function stopDetection() {
             }
             
             // Reset displays
-            document.getElementById('detectedSign').textContent = '-';
-            document.getElementById('translatedText').textContent = '-';
+            document.getElementById('detectedSign').textContent = 'Waiting for detection...';
+            document.getElementById('translatedText').textContent = 'Click translate to see translation';
         } else {
-            document.getElementById('message').innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+            showMessage('❌ ' + data.message, 'error');
         }
     } catch (error) {
-        document.getElementById('message').innerHTML = '<div class="alert alert-error">Failed to stop detection. Please try again.</div>';
+        showMessage('❌ Failed to stop detection. Please try again.', 'error');
     }
 }
 
@@ -129,11 +252,12 @@ async function getPrediction() {
         const data = await response.json();
         
         if (data.prediction && data.prediction !== '') {
-            document.getElementById('detectedSign').textContent = data.prediction;
+            const cleanPrediction = data.prediction.replace(/_/g, ' ');
+            document.getElementById('detectedSign').textContent = cleanPrediction;
             
-            // Text-to-speech
+            // Text-to-speech for new predictions
             if (data.prediction !== lastSpokenText) {
-                speakText(data.prediction);
+                speakText(cleanPrediction);
                 lastSpokenText = data.prediction;
             }
         }
@@ -147,20 +271,27 @@ function speakText(text) {
         speechSynthesis.cancel();
     }
     
-    const utterance = new SpeechSynthesisUtterance(text.replace('_', ' '));
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.8;
     utterance.pitch = 1;
+    utterance.volume = 0.8;
     speechSynthesis.speak(utterance);
 }
 
 async function translateText() {
     const currentText = document.getElementById('detectedSign').textContent;
     const selectedLanguage = document.getElementById('languageSelect').value;
+    const translateBtn = document.getElementById('translateBtn');
     
-    if (currentText === '-' || currentText === '') {
-        document.getElementById('message').innerHTML = '<div class="alert alert-error">No text to translate!</div>';
+    if (currentText === 'Waiting for detection...' || currentText === 'Detecting signs...' || currentText === '') {
+        showMessage('⚠️ No sign detected yet! Please wait for detection.', 'error');
         return;
     }
+    
+    // Add loading state
+    const originalText = translateBtn.innerHTML;
+    translateBtn.innerHTML = '<span class="loading"></span> Translating...';
+    translateBtn.disabled = true;
     
     try {
         const response = await fetch('/translate', {
@@ -178,25 +309,51 @@ async function translateText() {
         
         if (data.success) {
             document.getElementById('translatedText').textContent = data.translated_text;
+            showMessage(`✅ Translated to ${selectedLanguage}!`, 'success');
             
             // Speak translated text
             speakText(data.translated_text);
         } else {
-            document.getElementById('message').innerHTML = '<div class="alert alert-error">Translation failed: ' + data.message + '</div>';
+            showMessage('❌ Translation failed: ' + data.message, 'error');
         }
     } catch (error) {
-        document.getElementById('message').innerHTML = '<div class="alert alert-error">Translation failed. Please try again.</div>';
+        showMessage('❌ Translation failed. Please check your internet connection.', 'error');
+    } finally {
+        // Restore button
+        translateBtn.innerHTML = originalText;
+        translateBtn.disabled = false;
     }
 }
 
-// Clear messages after 5 seconds
-setInterval(() => {
-    const messageDiv = document.getElementById('message');
-    if (messageDiv.innerHTML.trim() !== '') {
-        setTimeout(() => {
-            messageDiv.innerHTML = '';
-        }, 5000);
+// Add entrance animations with delay
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.card, .video-container, .detection-results');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.2}s`;
+        card.classList.add('fade-in');
+    });
+});
+
+// Handle page visibility changes
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden && isDetecting) {
+        // Pause speech when tab is hidden
+        if (speechSynthesis.speaking) {
+            speechSynthesis.pause();
+        }
+    } else if (!document.hidden && isDetecting) {
+        // Resume speech when tab is visible
+        if (speechSynthesis.paused) {
+            speechSynthesis.resume();
+        }
     }
-}, 1000);
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (isDetecting) {
+        fetch('/stop_detection', { method: 'POST' });
+    }
+});
 </script>
 {% endblock %}

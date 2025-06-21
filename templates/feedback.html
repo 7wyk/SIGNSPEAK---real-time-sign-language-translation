@@ -1,29 +1,105 @@
 {% extends "base.html" %}
 
-{% block title %}Feedback - Sign Language Detection{% endblock %}
+{% block title %}Feedback - SignSpeak AI{% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 50px auto;">
-    <h2>Feedback</h2>
-    <p>We value your feedback! Please share your experience with our sign language detection system.</p>
+<div class="card fade-in" style="max-width: 700px; margin: 50px auto;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="margin-bottom: 20px; background: linear-gradient(45deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2.5rem;">
+            Your Feedback Matters
+        </h2>
+        <p style="color: rgba(255, 255, 255, 0.8); font-size: 1.1rem; line-height: 1.6;">
+            Help us improve SignSpeak AI by sharing your experience. Your insights drive our innovation and help us serve the community better.
+        </p>
+    </div>
     
     <div id="message"></div>
     
     <form id="feedbackForm">
         <div class="form-group">
-            <label for="feedback">Your Feedback:</label>
-            <textarea id="feedback" name="feedback" rows="5" placeholder="Please share your thoughts, suggestions, or report any issues..." required></textarea>
+            <label for="feedbackType">
+                <i style="margin-right: 8px;">📝</i>Feedback Type
+            </label>
+            <select id="feedbackType" name="feedbackType" required>
+                <option value="">Select feedback type</option>
+                <option value="bug">Bug Report</option>
+                <option value="feature">Feature Request</option>
+                <option value="improvement">Improvement Suggestion</option>
+                <option value="compliment">Compliment</option>
+                <option value="other">Other</option>
+            </select>
         </div>
         
-        <button type="submit" class="btn">Submit Feedback</button>
+        <div class="form-group">
+            <label for="rating">
+                <i style="margin-right: 8px;">⭐</i>Overall Rating
+            </label>
+            <select id="rating" name="rating" required>
+                <option value="">Rate your experience</option>
+                <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                <option value="4">⭐⭐⭐⭐ Good</option>
+                <option value="3">⭐⭐⭐ Average</option>
+                <option value="2">⭐⭐ Poor</option>
+                <option value="1">⭐ Very Poor</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="feedback">
+                <i style="margin-right: 8px;">💬</i>Your Detailed Feedback
+            </label>
+            <textarea id="feedback" name="feedback" rows="6" 
+                placeholder="Please share your thoughts, suggestions, experiences, or report any issues you encountered. The more details you provide, the better we can serve you..." required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="contact">
+                <i style="margin-right: 8px;">📧</i>Contact Email (Optional)
+            </label>
+            <input type="email" id="contact" name="contact" placeholder="Leave your email if you'd like us to follow up">
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 20px;">
+            <i style="margin-right: 8px;">🚀</i>Submit Feedback
+        </button>
     </form>
+    
+    <div style="margin-top: 40px; padding: 25px; background: rgba(96, 165, 250, 0.1); border-radius: 15px; border: 1px solid rgba(96, 165, 250, 0.2);">
+        <h4 style="color: #60a5fa; margin-bottom: 15px;">
+            <i style="margin-right: 8px;">💡</i>Why Your Feedback is Important
+        </h4>
+        <ul style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; padding-left: 20px;">
+            <li>Helps us identify and fix issues quickly</li>
+            <li>Guides our development priorities</li>
+            <li>Improves accessibility for the deaf and hard-of-hearing community</li>
+            <li>Makes SignSpeak AI more inclusive and user-friendly</li>
+        </ul>
+    </div>
 </div>
 
 <script>
 document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    const feedbackType = document.getElementById('feedbackType').value;
+    const rating = document.getElementById('rating').value;
     const feedback = document.getElementById('feedback').value;
+    const contact = document.getElementById('contact').value;
+    
+    // Combine all feedback data
+    const fullFeedback = {
+        type: feedbackType,
+        rating: rating,
+        message: feedback,
+        contact: contact,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Add loading state
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
+    submitBtn.disabled = true;
     
     try {
         const response = await fetch('/feedback', {
@@ -32,7 +108,7 @@ document.getElementById('feedbackForm').addEventListener('submit', async functio
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                feedback: feedback
+                feedback: JSON.stringify(fullFeedback)
             })
         });
         
@@ -40,13 +116,42 @@ document.getElementById('feedbackForm').addEventListener('submit', async functio
         const messageDiv = document.getElementById('message');
         
         if (data.success) {
-            messageDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
-            document.getElementById('feedback').value = '';
+            messageDiv.innerHTML = '<div class="alert alert-success"><strong>Thank you!</strong> Your feedback has been submitted successfully. We appreciate your input!</div>';
+            document.getElementById('feedbackForm').reset();
+            
+            // Scroll to top to show success message
+            window.scrollTo({top: 0, behavior: 'smooth'});
         } else {
             messageDiv.innerHTML = '<div class="alert alert-error">Failed to submit feedback. Please try again.</div>';
         }
     } catch (error) {
-        document.getElementById('message').innerHTML = '<div class="alert alert-error">Failed to submit feedback. Please try again.</div>';
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">Failed to submit feedback. Please check your connection and try again.</div>';
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+// Character counter for textarea
+document.getElementById('feedback').addEventListener('input', function() {
+    const maxLength = 1000;
+    const currentLength = this.value.length;
+    
+    // Create or update character counter
+    let counter = document.getElementById('char-counter');
+    if (!counter) {
+        counter = document.createElement('div');
+        counter.id = 'char-counter';
+        counter.style.cssText = 'text-align: right; font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); margin-top: 5px;';
+        this.parentNode.appendChild(counter);
+    }
+    
+    counter.textContent = `${currentLength} characters`;
+    
+    if (currentLength > maxLength * 0.9) {
+        counter.style.color = '#f59e0b';
+    } else {
+        counter.style.color = 'rgba(255, 255, 255, 0.6)';
     }
 });
 </script>

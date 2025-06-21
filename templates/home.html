@@ -1,25 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Sign Language Detection{% endblock %}
+{% block title %}SignSpeak AI - Revolutionary Real-time Sign Language Translation{% endblock %}
 
 {% block content %}
 <div style="text-align: center; padding: 50px 0;">
-    <h1>Sign Language Detection System</h1>
-    <p>Real-time sign language recognition and translation</p>
-    
-    <div style="margin: 40px 0;">
-        <h2>Features:</h2>
-        <ul style="list-style: none; padding: 0;">
-            <li>✓ Real-time hand sign detection</li>
-            <li>✓ Text and speech output</li>
-            <li>✓ Multi-language translation</li>
-            <li>✓ User authentication</li>
-        </ul>
+    <div class="fade-in">
+        <h1 style="font-size: 4rem; font-weight: bold; margin-bottom: 20px; background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            SignSpeak AI
+        </h1>
+        <p style="font-size: 1.5rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 50px; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Revolutionary real-time sign language translation system powered by AI
+        </p>
+        
+        <button class="btn pulse" onclick="getStarted()" style="font-size: 18px; padding: 20px 40px; margin-bottom: 60px;">
+            Get Started →
+        </button>
     </div>
     
-    <button class="btn" onclick="getStarted()" style="font-size: 18px; padding: 15px 30px;">
-        Get Started
-    </button>
+    <div class="feature-grid fade-in">
+        <div class="feature-card">
+            <div class="feature-icon blue">⚡</div>
+            <h3 style="margin-bottom: 15px; font-size: 1.5rem;">Real-Time Processing</h3>
+            <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                Instant sign language recognition and translation with advanced AI algorithms for seamless communication.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon purple">🌐</div>
+            <h3 style="margin-bottom: 15px; font-size: 1.5rem;">Multilingual Support</h3>
+            <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                Support for multiple languages including Hindi, Kannada, Malayalam, Japanese, and English.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon green">⭐</div>
+            <h3 style="margin-bottom: 15px; font-size: 1.5rem;">Accessibility First</h3>
+            <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                Breaking communication barriers and making technology accessible for the deaf and hard-of-hearing community.
+            </p>
+        </div>
+    </div>
+    
+    <div class="card" style="margin-top: 60px; text-align: left;">
+        <h2 style="text-align: center; margin-bottom: 30px; background: linear-gradient(45deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            How It Works
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+            <div style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(45deg, #3b82f6, #60a5fa); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 24px;">1</div>
+                <h4 style="margin-bottom: 10px;">Register & Login</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Create your account to access the detection system</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(45deg, #8b5cf6, #a78bfa); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 24px;">2</div>
+                <h4 style="margin-bottom: 10px;">Start Detection</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Allow camera access and begin real-time sign detection</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(45deg, #10b981, #34d399); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 24px;">3</div>
+                <h4 style="margin-bottom: 10px;">Get Translation</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Receive instant text and audio translation in your preferred language</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -31,5 +76,14 @@ function getStarted() {
         window.location.href = '/login';
     }
 }
+
+// Add entrance animations with delay
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.feature-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.2}s`;
+        card.classList.add('fade-in');
+    });
+});
 </script>
 {% endblock %}

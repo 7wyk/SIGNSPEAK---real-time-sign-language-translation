@@ -1,29 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}Login - Sign Language Detection{% endblock %}
+{% block title %}Login - SignSpeak AI{% endblock %}
 
 {% block content %}
-<div style="max-width: 400px; margin: 50px auto;">
-    <h2>Login</h2>
+<div class="card fade-in" style="max-width: 500px; margin: 50px auto; text-align: center;">
+    <h2 style="margin-bottom: 30px; background: linear-gradient(45deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2.5rem;">
+        Welcome Back
+    </h2>
+    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 1.1rem;">
+        Sign in to your account
+    </p>
     
     <div id="message"></div>
     
-    <form id="loginForm">
+    <form id="loginForm" style="text-align: left;">
         <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <label for="username">
+                <i style="margin-right: 8px;">👤</i>Email Address
+            </label>
+            <input type="text" id="username" name="username" placeholder="Enter your email" required>
         </div>
         
         <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <label for="password">
+                <i style="margin-right: 8px;">🔒</i>Password
+            </label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
         </div>
         
-        <button type="submit" class="btn">Login</button>
+        <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 20px;">
+            Sign In
+        </button>
     </form>
     
-    <p style="margin-top: 20px;">
-        Don't have an account? <a href="/register">Register here</a>
+    <p style="margin-top: 30px; color: rgba(255, 255, 255, 0.7);">
+        Don't have an account? 
+        <a href="/register" style="color: #60a5fa; text-decoration: none; font-weight: 600;">Sign up</a>
     </p>
 </div>
 
@@ -33,6 +45,12 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    
+    // Add loading state
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="loading"></span> Signing in...';
+    submitBtn.disabled = true;
     
     try {
         const response = await fetch('/login', {
@@ -57,9 +75,20 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             }, 1500);
         } else {
             messageDiv.innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
     } catch (error) {
         document.getElementById('message').innerHTML = '<div class="alert alert-error">Login failed. Please try again.</div>';
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+// Add enter key support
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
     }
 });
 </script>

@@ -1,29 +1,48 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Sign Language Detection{% endblock %}
+{% block title %}Register - SignSpeak AI{% endblock %}
 
 {% block content %}
-<div style="max-width: 400px; margin: 50px auto;">
-    <h2>Register</h2>
+<div class="card fade-in" style="max-width: 500px; margin: 50px auto; text-align: center;">
+    <h2 style="margin-bottom: 30px; background: linear-gradient(45deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2.5rem;">
+        Create Account
+    </h2>
+    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 1.1rem;">
+        Join SignSpeak AI to start your journey
+    </p>
     
     <div id="message"></div>
     
-    <form id="registerForm">
+    <form id="registerForm" style="text-align: left;">
         <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <label for="username">
+                <i style="margin-right: 8px;">👤</i>Email Address
+            </label>
+            <input type="email" id="username" name="username" placeholder="Enter your email address" required>
         </div>
         
         <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <label for="password">
+                <i style="margin-right: 8px;">🔒</i>Password
+            </label>
+            <input type="password" id="password" name="password" placeholder="Create a strong password" required minlength="5">
         </div>
         
-        <button type="submit" class="btn">Register</button>
+        <div class="form-group">
+            <label for="confirmPassword">
+                <i style="margin-right: 8px;">🔒</i>Confirm Password
+            </label>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 20px;">
+            Create Account
+        </button>
     </form>
     
-    <p style="margin-top: 20px;">
-        Already have an account? <a href="/login">Login here</a>
+    <p style="margin-top: 30px; color: rgba(255, 255, 255, 0.7);">
+        Already have an account? 
+        <a href="/login" style="color: #60a5fa; text-decoration: none; font-weight: 600;">Sign in</a>
     </p>
 </div>
 
@@ -33,6 +52,19 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    // Validate passwords match
+    if (password !== confirmPassword) {
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">Passwords do not match!</div>';
+        return;
+    }
+    
+    // Add loading state
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="loading"></span> Creating account...';
+    submitBtn.disabled = true;
     
     try {
         const response = await fetch('/register', {
@@ -56,9 +88,27 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             }, 1500);
         } else {
             messageDiv.innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
     } catch (error) {
         document.getElementById('message').innerHTML = '<div class="alert alert-error">Registration failed. Please try again.</div>';
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+// Real-time password confirmation validation
+document.getElementById('confirmPassword').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = this.value;
+    
+    if (confirmPassword && password !== confirmPassword) {
+        this.style.borderColor = '#ef4444';
+        this.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+    } else {
+        this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        this.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
     }
 });
 </script>
