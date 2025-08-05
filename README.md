@@ -17,6 +17,19 @@ WebRTC Integration - Smooth video streaming
 Responsive Design - Modern, accessible UI with animations
 RESTful API - Clean backend architecture
 
+Backend Technologies
+
+Complete list of Python packages with version numbers
+Core frameworks (Flask, OpenCV, MediaPipe)
+ML libraries (scikit-learn, pandas, NumPy)
+Authentication and translation services
+
+Frontend Technologies
+
+Modern web technologies (HTML5, CSS3, ES6+ JavaScript)
+Real-time communication (WebRTC)
+Responsive design methodologies
+
 🚀 Quick Start
 Prerequisites
 
