@@ -220,14 +220,6 @@ Flask Community - For the robust web framework
 OpenCV Contributors - For computer vision tools
 Sign Language Community - For inspiration and feedback
 
-📞 Support
-Having issues or questions? We're here to help!
-
-📫 Email: support@signspeak-ai.com
-🐛 Bug Reports: GitHub Issues
-💡 Feature Requests: GitHub Discussions
-📱 Community: Join our Discord server
-
 🌍 Impact
 SignSpeak AI aims to:
 
